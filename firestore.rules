@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// Only a signed-in user can read or write their own document under
+// /users/{uid}. This is what keeps the streak tracker (and everything
+// else on the Profile screen) private to each account and stops it
+// from silently failing to load once Firebase's default "test mode"
+// window expires.
+//
+// Deploy with: firebase deploy --only firestore:rules
+// (requires the Firebase CLI and `firebase login` first)
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
